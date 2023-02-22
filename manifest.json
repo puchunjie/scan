@@ -1,5 +1,5 @@
 {
-    "name" : "scan",
+    "name" : "嘉实多scan助手",
     "appid" : "__UNI__B6E0B2A",
     "description" : "",
     "versionName" : "1.0.0",
@@ -20,7 +20,7 @@
         "modules" : {
             "SQLite" : {}
         },
-		"onCreate": "initApp()",
+        "onCreate" : "initApp()",
         /* 应用发布信息 */
         "distribute" : {
             /* android打包配置 */
@@ -44,9 +44,13 @@
                 ]
             },
             /* ios打包配置 */
-            "ios" : {},
+            "ios" : {
+                "dSYMs" : false
+            },
             /* SDK配置 */
-            "sdkConfigs" : {}
+            "sdkConfigs" : {
+                "ad" : {}
+            }
         }
     },
     /* 快应用特有相关 */

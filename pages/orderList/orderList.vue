@@ -62,7 +62,7 @@
 					success: async (res) => {
 						const typeList = [4, 12];
 						const type = typeList[res.tapIndex]
-						
+
 						const items = await getAllItem({
 							type,
 							orderId: orderItem.id
@@ -77,7 +77,13 @@
 							}
 						})
 						const boxNumber = Object.keys(boxMap).length;
-
+						if (boxNumber == 0) {
+							uni.showToast({
+								icon: 'error',
+								title: '没有数据可以生成文件'
+							})
+							return
+						}
 						console.log('boxNumber', boxNumber)
 						this.createTxt(orderItem, boxNumber, items)
 						console.log('textContent', textContent)
@@ -89,7 +95,9 @@
 			},
 			createTxt(orderInfo, boxNumber, items) {
 				const productDate = orderInfo.product_date.split('-').join('');
-				const fileName = `dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_TC#PLANT_${orderInfo.line}_${productDate}144857224`
+				const orderInfoLine = orderInfo.line.split(' ').join('#');
+				const fileName =
+					`dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_TC#PLANT_${orderInfoLine}_${productDate}144857224`
 				const line1 =
 					`H,MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1,${orderInfo.factory_code},${orderInfo.line},${orderInfo.sku},${orderInfo.batch_no},${orderInfo.product_date},${boxNumber}`
 				const line2 = items.map((i, index) => {

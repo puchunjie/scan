@@ -46,12 +46,20 @@
 		data() {
 			return {
 				formData: {
-					batchNo: '23230211',
-					productDate: "2021-12-22",
-					factoryCode: 'TC PLANT',
-					line: 'C61',
-					sku: '3430385',
-				}
+					batchNo: '',
+					productDate: "",
+					factoryCode: '',
+					line: '',
+					sku: '',
+				},
+				// formData: {
+				// 	batchNo: '23230211',
+				// 	productDate: "2021-12-22",
+				// 	factoryCode: 'TC PLANT',
+				// 	line: 'C61',
+				// 	sku: '3430385',
+				// },
+				
 			};
 		},
 		computed: {
@@ -86,8 +94,10 @@
 
 			},
 			bindDateChange(e) {
+				console.log(e)
 				const date = e?.detail?.value || ''
-				this.formData.productionDate = date;
+				console.log(date)
+				this.formData.productDate = date;
 			}
 		}
 	}
@@ -135,8 +145,12 @@
 				}
 
 				.date-picker {
+					display: block;
+					width: 100%;
+					height: 100%;
 					font-size: 14px;
-					margin: 10px 0 0 10px;
+					line-height: 40px;
+					text-indent: 10px;
 				}
 			}
 		}

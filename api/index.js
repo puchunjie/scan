@@ -177,9 +177,9 @@ export const scanOne = async (orderId, scanNo, type) => {
 	}
 
 	if (isItem) {
-		insertOneItem(orderId, scanNo, type);
+		await insertOneItem(orderId, scanNo, type);
 	} else {
-		oneBoxFull(orderId, scanNo, type);
+		await oneBoxFull(orderId, scanNo, type);
 	}
 	return [true, isItem, '扫描数量与实际每箱数量不符'];
 }
