@@ -9,7 +9,7 @@
 		<view class="form-group">
 			<view class="label">批次号</view>
 			<view class="value">
-				<input v-model="formData.batchNumber" />
+				<input v-model="formData.batchNo" />
 			</view>
 		</view>
 		<view class="form-group">
@@ -21,15 +21,15 @@
 		<view class="form-group">
 			<view class="label">产线</view>
 			<view class="value">
-				<input v-model="formData.productionLine" />
+				<input v-model="formData.line" />
 			</view>
 		</view>
 		<view class="form-group">
 			<view class="label">生产日期</view>
 			<view class="value">
 				<!-- <input v-model="formData.productionDate" /> -->
-				<picker class="date-picker" mode="date" :value="formData.productionDate" @change="bindDateChange">
-					<view class="uni-input">{{formData.productionDate}}</view>
+				<picker class="date-picker" mode="date" :value="formData.productDate" @change="bindDateChange">
+					<view class="uni-input">{{formData.productDate}}</view>
 				</picker>
 			</view>
 		</view>
@@ -39,34 +39,51 @@
 </template>
 
 <script>
+	import {
+		createOrder
+	} from '@/api/index.js'
 	export default {
 		data() {
 			return {
 				formData: {
-					batchNumber: '23230211',
-					productionDate: "2021-12-22",
+					batchNo: '23230211',
+					productDate: "2021-12-22",
 					factoryCode: 'TC PLANT',
-					productionLine: 'C61',
+					line: 'C61',
 					sku: '3430385',
 				}
 			};
 		},
 		computed: {
 			isAdd() {
-				return this.$route.query.id === undefined
+				const pages = getCurrentPages();
+				const currentPage = pages[pages.length - 1];
+				const route = currentPage.route;
+				const query = currentPage.options;
+				return query.id === undefined
 			}
 		},
 		methods: {
-			submit() {
+			async submit() {
 				if (Object.keys(this.formData).some(key => !this.formData[key])) {
 					uni.showToast({
 						title: '请填写完整表单！'
 					})
-					return 
+					return
 				}
-				
+
 				console.log(this.formData);
-				uni.navigateBack();
+				const [success, e] = await createOrder(this.formData)
+				console.log(success, e)
+				if (success) {
+					uni.navigateBack();
+					return
+				}
+				uni.showToast({
+					icon: "error",
+					title: e
+				})
+
 			},
 			bindDateChange(e) {
 				const date = e?.detail?.value || ''
@@ -116,7 +133,7 @@
 					border: 0;
 					padding: 0 10px;
 				}
-				
+
 				.date-picker {
 					font-size: 14px;
 					margin: 10px 0 0 10px;

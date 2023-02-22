@@ -1,6 +1,9 @@
 <script>
+	import { createDb, openDb, closeDB } from '@/api/index.js'
 	export default {
-		onLaunch: function() {
+		onLaunch: async function() {
+			await openDb()
+			createDb()
 			console.log('App Launch')
 		},
 		onShow: function() {
@@ -8,7 +11,8 @@
 		},
 		onHide: function() {
 			console.log('App Hide')
-		}
+			closeDB()
+		},
 	}
 </script>
 

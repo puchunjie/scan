@@ -8,7 +8,7 @@
     /* 5+App特有相关 */
     "app-plus" : {
         "usingComponents" : true,
-        "nvueStyleCompiler" : "uni-app",
+        "nvueStyleCompiler" : "扫码",
         "compilerVersion" : 3,
         "splashscreen" : {
             "alwaysShowBeforeRender" : true,
@@ -20,6 +20,7 @@
         "modules" : {
             "SQLite" : {}
         },
+		"onCreate": "initApp()",
         /* 应用发布信息 */
         "distribute" : {
             /* android打包配置 */

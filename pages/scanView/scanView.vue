@@ -4,6 +4,7 @@
 			<view class="box" :class="boxIn && 'filled'" v-for="boxIn in boxs">{{ boxIn ? '满' : '空' }}</view>
 		</view>
 		<view class="count">本箱状态：{{ filledNum }}/{{ boxSize }}</view>
+		<view class="count">已装箱数：{{ packageBoxNumber }}</view>
 		<view class="box-full-tip" v-show="isFull">请扫描箱子条形码,完成装箱</view>
 
 
@@ -13,11 +14,18 @@
 			<view class="btn" @click="goList">完成扫码</view>
 		</view>
 
+		<xw-scan></xw-scan>
 		<!-- <view class="btn" @click="fillBox">addOne</view> -->
 	</view>
 </template>
 
 <script>
+	const xwscan = uni.requireNativePlugin("xw-scan");
+	import {
+		scanOne,
+		getAllItem,
+	} from '@/api/index.js'
+
 	const BOX4 = 4;
 	const BOX12 = 12;
 	export default {
@@ -25,10 +33,17 @@
 			return {
 				boxSize: BOX4,
 				boxs: [],
-				packed: false, // 是否完成箱子扫码
+				packageBoxNumber: 0, 
 			};
 		},
 		computed: {
+			id() {
+				const pages = getCurrentPages();
+				const currentPage = pages[pages.length - 1];
+				const route = currentPage.route;
+				const query = currentPage.options;
+				return query.id
+			},
 			filledNum() {
 				return this.boxs.filter(done => done).length || 0
 			},
@@ -42,25 +57,54 @@
 					url: '/pages/orderList/orderList'
 				})
 			},
-			init() {
+			async init() {
 				// 初始化箱子
 				const boxs = new Array(this.boxSize).fill(false);
 				this.boxs = boxs;
+				const items = await getAllItem({
+					orderId: this.id,
+					type: this.boxSize
+				});
+				console.log('items', items)
+				const needFillNumer = items.filter(i => i.status == 0)?.length || 0;
+				console.log('needFillNumer', needFillNumer)
+				needFillNumer && this.fillBox(needFillNumer);
+				const packageBoxList = [...new Set(items.filter(item => item.box_no != -1 && item.status > 0).map(
+					item => item.box_no))]
+				this.packageBoxNumber = packageBoxList?.length || 0;
 			},
 			changeSize(size) {
 				this.boxSize = size;
 				this.init();
 			},
-			fillBox() {
+			fillBox(num = 1) {
 				if (this.isFull) {
 					return
 				}
-				this.$set(this.boxs, this.filledNum, true)
+				if (num > 1) {
+					this.boxs = this.boxs.map((done, index) => {
+						return index < num
+					})
+				} else {
+					this.$set(this.boxs, this.filledNum, true)
+				}
 			},
-			xwScan(res) {
-				let ScanVal = res.code.replace(/\n|\r/g, "");
-				if (ScanVal) {
-					// do someting
+			async xwScan(res) {
+				const scanNo = res.code.replace(/\n|\r/g, "");
+				if (scanNo) {
+					const [success, isItem, e] = await scanOne(this.id, scanNo, this.boxSize)
+					if (success) {
+						if (isItem) {
+							this.fillBox()
+						} else {
+							this.init();
+						}
+					} else {
+						uni.showToast({
+							icon: 'error',
+							title: e
+						})
+					}
 				};
 			}
 		},
