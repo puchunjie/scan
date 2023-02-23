@@ -95,9 +95,9 @@
 			},
 			createTxt(orderInfo, boxNumber, items) {
 				const productDate = orderInfo.product_date.split('-').join('');
-				const orderInfoLine = orderInfo.line.split(' ').join('#');
+				const factoryCode = factoryCode.line.split(' ').join('#');
 				const fileName =
-					`dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_TC#PLANT_${orderInfoLine}_${productDate}144857224`
+					`dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_${factoryCode}_${{orderInfo.line}_${productDate}144857224`
 				const line1 =
 					`H,MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1,${orderInfo.factory_code},${orderInfo.line},${orderInfo.sku},${orderInfo.batch_no},${orderInfo.product_date},${boxNumber}`
 				const line2 = items.map((i, index) => {
