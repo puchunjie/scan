@@ -84,73 +84,82 @@
 							})
 							return
 						}
-						console.log('boxNumber', boxNumber)
-						this.createTxt(orderItem, boxNumber, items)
-						console.log('textContent', textContent)
-						// setTimeout(() => {
-						// 	uni.hideLoading()
-						// }, 2000)
+						const textFileInfo = this.createTxt(orderItem, boxNumber, items)
+						const excelFileInfo = this.createExcel(orderItem, items);
+						uni.showLoading({
+							title: '文件导出中...',
+							mask: true
+						})
+						try {
+							await writeFile(textFileInfo)
+							await writeFile(excelFileInfo)
+							uni.hideLoading()
+							uni.showToast({
+								title: '文件已保存到本地',
+								icon: 'success',
+							});
+						} catch (error) {
+							uni.hideLoading()
+						}
 					},
 				})
 			},
 			createTxt(orderInfo, boxNumber, items) {
 				const productDate = orderInfo.product_date.split('-').join('');
 				const factoryCode = factoryCode.line.split(' ').join('#');
-				const fileName =
-					`dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_${factoryCode}_${{orderInfo.line}_${productDate}144857224`
+				const fileName = `dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_${factoryCode}_${orderInfo.line}_${productDate}144857224.txt`
 				const line1 =
 					`H,MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1,${orderInfo.factory_code},${orderInfo.line},${orderInfo.sku},${orderInfo.batch_no},${orderInfo.product_date},${boxNumber}`
 				const line2 = items.map((i, index) => {
 					return `L,MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1,${index + 1},${i.box_no},${i.item_no},${orderInfo.product_date} ${i.create_date}.000`
 				}).join('\n')
-				const content = `${line1}\n${line2}`
-				uni.showLoading({
-					title: '文件导出中...',
-					mask: true
-				})
-				console.log('fileName', fileName)
-				plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS, (fs) => {
-					fs.root.getFile(`${fileName}.txt`, {
-						create: true
-					}, (fileEntry) => {
-						fileEntry.createWriter((writer) => {
-							writer.onwriteend = () => {
-								uni.hideLoading()
-								uni.showToast({
-									title: '文件已保存到本地',
-									icon: 'success',
-								});
-							};
-							writer.onerror = (e) => {
-								console.log('保存文件失败', e);
-								uni.hideLoading()
-								uni.showToast({
-									title: '保存文件失败，请手动同步',
-									icon: 'none',
-								});
-							};
-							console.log('write', writer)
-							writer.write(content);
+				const fileContent = `${line1}\n${line2}`
+				return { fileName, fileContent }
+				
+			},
+			createExcel(orderItem, items) {
+				const orderNo = orderInfo.orderNo;
+				const excelFormatData = items.map(item => ({
+					'订单号': orderNo,
+					'条码信息': item.box_no,
+					'产品代码': orderItem.sku,
+				}))
+				const worksheet = XLSX.utils.json_to_sheet(excelFormatData);
+				const htmlSheet = XLSX.utils.sheet_to_html(worksheet);
+				const fileContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+			                       xmlns:x="urn:schemas-microsoft-com:office:excel"
+			                       xmlns="http://www.w3.org/TR/REC-html40">
+			                       <head><!--[if gte mso 9]><xml encoding="UTF-8"><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+			                       <x:Name>sheet1</x:Name>
+			                       <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+			                       </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+			                       </head><body>${htmlSheet}</body>
+								</html>`;
+				return { fileName: orderNo, fileContent }
+			},
+			writeFile({fileName, fileContent}) {
+				return new Promise((resolve, reject) => {
+					plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS, (fs) => {
+						fs.root.getFile(fileName, {
+							create: true
+						}, (fileEntry) => {
+							fileEntry.createWriter((writer) => {
+								writer.onwriteend = () => {
+									resolve()
+								};
+								writer.onerror = (e) => {
+									reject()
+								};
+								writer.write(fileContent);
+							});
+						}, (e) => {
+							reject()
 						});
 					}, (e) => {
-						console.log('获取文件失败', e);
-						uni.hideLoading()
-						uni.showToast({
-							title: '获取文件失败',
-							icon: 'none',
-							duration: 2000
-						});
-					});
-				}, (e) => {
-					console.log('请求文件系统失败', e);
-					uni.hideLoading()
-					uni.showToast({
-						title: '请求文件系统失败',
-						icon: 'none',
-						duration: 2000
+						reject()
 					});
 				});
-			}
+			},
 		},
 		onShow() {
 			this.getList();
