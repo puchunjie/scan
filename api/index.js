@@ -58,7 +58,10 @@ export const createDb = async () => {
 								      line TEXT,
 									  sku TEXT,
 									  status INT(1),
-								      create_date TEXT
+								      create_date TEXT,
+									  orderno TEXT,
+									  field1 TEXT,
+									  field2 TEXT
 								    );`)
 
 
@@ -190,15 +193,18 @@ export const createOrder = async ({
 	productDate,
 	factoryCode,
 	line,
-	sku
+	sku,
+	orderno,
+	field1,
+	field2
 }) => {
 
 	let sqll =
-		'insert into t_order values(null,\':batchNo\',\':productDate\',\':factoryCode\',\':line\',\':sku\',0,CURRENT_TIMESTAMP)';
+		'insert into t_order values(null,\':batchNo\',\':productDate\',\':factoryCode\',\':line\',\':sku\',0,CURRENT_TIMESTAMP,orderno,field1,field2)';
 	sqll = sqll.replace(':batchNo', batchNo).replace(':productDate', productDate).replace(
 			':factoryCode',
 			factoryCode)
-		.replace(':line', line).replace(':sku', sku)
+		.replace(':line', line).replace(':sku', sku).replace(':orderno', orderno).replace(':field1', field1).replace(':field2', ,field2)
 	const [success, e] = await executeSQL(sqll)
 	return [success, e]
 	// return new Promise((resolve, reject) => {
@@ -213,13 +219,16 @@ export const updateOrder = ({
 	productDate,
 	factoryCode,
 	line,
-	sku
+	sku,
+	orderno,
+	field1,
+	field2
 }) => {
 	let sqll =
 		'update t_order set batchNo=\':batchNo\',productDate=\':productDate\',factoryCode=\':factoryCode\',line=\':line\',sku=\':sku\'';
 	sqll = sqll.replace(':batchNo', batchNo).replace(':productDate', productDate).replace(':factoryCode',
 			factoryCode)
-		.replace(':line', line).replace(':sku', sku)
+		.replace(':line', line).replace(':sku', sku).replace(':orderno', orderno).replace(':field1', field1).replace(':field2', ,field2)
 	executeSQL(sqll);
 }
 
