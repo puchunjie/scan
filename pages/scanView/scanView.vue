@@ -1,6 +1,6 @@
 <template>
 	<view class="scan-page">
-		<view class="boxs-warp">
+		<view class="boxs-warp" :class="boxSize === 1 && 'box1'">
 			<view class="box" :class="boxIn && 'filled'" v-for="boxIn in boxs">{{ boxIn ? '满' : '空' }}</view>
 		</view>
 		<view class="count">本箱状态：{{ filledNum }}/{{ boxSize }}</view>
@@ -9,6 +9,7 @@
 
 
 		<view class="btn-group">
+			<view class="btn" @click="changeSize(1)">1个装</view>
 			<view class="btn" @click="changeSize(4)">4个装</view>
 			<view class="btn" @click="changeSize(12)">12个装</view>
 			<view class="btn" @click="goList">完成扫码</view>
@@ -25,13 +26,14 @@
 		scanOne,
 		getAllItem,
 	} from '@/api/index.js'
-
+	
+	const BOX1 = 1;
 	const BOX4 = 4;
 	const BOX12 = 12;
 	export default {
 		data() {
 			return {
-				boxSize: BOX4,
+				boxSize: BOX1,
 				boxs: [],
 				packageBoxNumber: 0, 
 			};
@@ -143,6 +145,15 @@
 					background-color: green;
 				}
 			}
+			
+			&.box1 {
+				.box {
+					width: 70%;
+					height: 120px;
+					line-height: 120px;
+					margin: 0 auto 20px;
+				}
+			}
 		}
 
 		.count {
@@ -176,7 +187,7 @@
 			box-sizing: border-box;
 
 			.btn {
-				width: 30%;
+				width: 23%;
 				height: 100%;
 				text-align: center;
 				background-color: green;

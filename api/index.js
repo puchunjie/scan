@@ -200,16 +200,13 @@ export const createOrder = async ({
 }) => {
 
 	let sqll =
-		'insert into t_order values(null,\':batchNo\',\':productDate\',\':factoryCode\',\':line\',\':sku\',0,CURRENT_TIMESTAMP,orderno,field1,field2)';
-	sqll = sqll.replace(':batchNo', batchNo).replace(':productDate', productDate).replace(
-			':factoryCode',
-			factoryCode)
-		.replace(':line', line).replace(':sku', sku).replace(':orderno', orderno).replace(':field1', field1).replace(':field2', ,field2)
+		'insert into t_order values(null,\':batchNo\',\':productDate\',\':factoryCode\',\':line\',\':sku\',0,CURRENT_TIMESTAMP,\':orderno\',\':field1\',\':field2\')';
+	sqll = sqll.replace(':batchNo', batchNo).replace(':productDate', productDate).replace(':factoryCode',
+		factoryCode).replace(':line', line).replace(':sku', sku).replace(':orderno', orderno).replace(
+		':field1', field1).replace(':field2', field2)
+	console.log('sqll', sqll)
 	const [success, e] = await executeSQL(sqll)
 	return [success, e]
-	// return new Promise((resolve, reject) => {
-
-	// })
 }
 
 //更新订单
@@ -228,7 +225,8 @@ export const updateOrder = ({
 		'update t_order set batchNo=\':batchNo\',productDate=\':productDate\',factoryCode=\':factoryCode\',line=\':line\',sku=\':sku\'';
 	sqll = sqll.replace(':batchNo', batchNo).replace(':productDate', productDate).replace(':factoryCode',
 			factoryCode)
-		.replace(':line', line).replace(':sku', sku).replace(':orderno', orderno).replace(':field1', field1).replace(':field2', ,field2)
+		.replace(':line', line).replace(':sku', sku).replace(':orderno', orderno).replace(':field1', field1)
+		.replace(':field2', field2)
 	executeSQL(sqll);
 }
 

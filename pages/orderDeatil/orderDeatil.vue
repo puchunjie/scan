@@ -1,6 +1,12 @@
 <template>
 	<view class="form-page">
 		<view class="form-group">
+			<view class="label">订单号</view>
+			<view class="value">
+				<input v-model="formData.orderno" />
+			</view>
+		</view>
+		<view class="form-group">
 			<view class="label">SKU</view>
 			<view class="value">
 				<input v-model="formData.sku" />
@@ -51,15 +57,17 @@
 					factoryCode: '',
 					line: '',
 					sku: '',
+					orderno: '',
 				},
 				// formData: {
-				// 	batchNo: '23230211',
-				// 	productDate: "2021-12-22",
-				// 	factoryCode: 'TC PLANT',
-				// 	line: 'C61',
-				// 	sku: '3430385',
+				// 	batchNo: 'K230001',
+				// 	productDate: "",
+				// 	factoryCode: 'WXKJ',
+				// 	line: 'A01',
+				// 	sku: '3435110',
+				// 	orderno: '58738201',
 				// },
-				
+
 			};
 		},
 		computed: {

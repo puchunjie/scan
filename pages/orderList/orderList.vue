@@ -2,6 +2,9 @@
 	<view class="order-list-page">
 		<view class="order-item" v-for="item in list" :key="item.id">
 			<view class="task-no">
+				订单号: {{ item.orderno }}
+			</view>
+			<view class="task-no">
 				sku: {{ item.sku }}
 			</view>
 			<view class="task-no">
@@ -16,7 +19,7 @@
 			<view class="task-no">
 				生产日期: {{ item.product_date }}
 			</view>
-			<view class="task-no">
+			<view class="task-no full">
 				创建日期: {{ item.create_date }}
 			</view>
 			<view class="item-btn" @click="goScan(item.id)">前往扫码</view>
@@ -32,6 +35,7 @@
 		queryOrderList,
 		getAllItem
 	} from '@/api/index.js'
+	import XLSX from '@/static/xlsx.full.min.js'
 	export default {
 		data() {
 			return {
@@ -58,9 +62,9 @@
 				// 查询订单下的瓶箱信息
 				const data = [];
 				uni.showActionSheet({
-					itemList: ['4瓶装', '12瓶装'],
+					itemList: ['1瓶装', '4瓶装', '12瓶装'],
 					success: async (res) => {
-						const typeList = [4, 12];
+						const typeList = [1, 4, 12];
 						const type = typeList[res.tapIndex]
 
 						const items = await getAllItem({
@@ -77,6 +81,7 @@
 							}
 						})
 						const boxNumber = Object.keys(boxMap).length;
+						console.log('boxNumber', boxNumber)
 						if (boxNumber == 0) {
 							uni.showToast({
 								icon: 'error',
@@ -91,14 +96,15 @@
 							mask: true
 						})
 						try {
-							await writeFile(textFileInfo)
-							await writeFile(excelFileInfo)
+							await this.writeFile(textFileInfo)
+							await this.writeFile(excelFileInfo)
 							uni.hideLoading()
 							uni.showToast({
 								title: '文件已保存到本地',
 								icon: 'success',
 							});
 						} catch (error) {
+							console.log('err', error)
 							uni.hideLoading()
 						}
 					},
@@ -106,23 +112,27 @@
 			},
 			createTxt(orderInfo, boxNumber, items) {
 				const productDate = orderInfo.product_date.split('-').join('');
-				const factoryCode = factoryCode.line.split(' ').join('#');
-				const fileName = `dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_${factoryCode}_${orderInfo.line}_${productDate}144857224.txt`
+				const factoryCode = orderInfo.line.split(' ').join('#');
+				const fileName =
+					`dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_${factoryCode}_${orderInfo.line}_${productDate}144857224.txt`
 				const line1 =
 					`H,MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1,${orderInfo.factory_code},${orderInfo.line},${orderInfo.sku},${orderInfo.batch_no},${orderInfo.product_date},${boxNumber}`
 				const line2 = items.map((i, index) => {
 					return `L,MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1,${index + 1},${i.box_no},${i.item_no},${orderInfo.product_date} ${i.create_date}.000`
 				}).join('\n')
 				const fileContent = `${line1}\n${line2}`
-				return { fileName, fileContent }
-				
+				return {
+					fileName,
+					fileContent
+				}
+
 			},
-			createExcel(orderItem, items) {
-				const orderNo = orderInfo.orderNo;
+			createExcel(orderInfo, items) {
+				const orderNo = orderInfo.orderno;
 				const excelFormatData = items.map(item => ({
 					'订单号': orderNo,
 					'条码信息': item.box_no,
-					'产品代码': orderItem.sku,
+					'产品代码': orderInfo.sku,
 				}))
 				const worksheet = XLSX.utils.json_to_sheet(excelFormatData);
 				const htmlSheet = XLSX.utils.sheet_to_html(worksheet);
@@ -135,9 +145,16 @@
 			                       </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
 			                       </head><body>${htmlSheet}</body>
 								</html>`;
-				return { fileName: orderNo, fileContent }
+				return {
+					fileName: `${orderNo}.xlsx`,
+					fileContent
+				}
 			},
-			writeFile({fileName, fileContent}) {
+			writeFile({
+				fileName,
+				fileContent
+			}) {
+				console.log('fileName', fileName)
 				return new Promise((resolve, reject) => {
 					plus.io.requestFileSystem(plus.io.PUBLIC_DOWNLOADS, (fs) => {
 						fs.root.getFile(fileName, {
@@ -196,6 +213,10 @@
 
 		.task-no {
 			width: 50%;
+
+			&.full {
+				width: 100%;
+			}
 		}
 
 		.item-btn {
@@ -203,11 +224,13 @@
 			height: 34px;
 			line-height: 34px;
 			text-align: center;
-			margin-right: 5%;
 			margin-top: 10px;
 			background: green;
 			border-radius: 5px;
 			color: #fff;
+			&:last-child {
+				margin-left: 10%;
+			}
 		}
 	}
 </style>
