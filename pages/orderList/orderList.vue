@@ -112,7 +112,11 @@
 			},
 			createTxt(orderInfo, boxNumber, items) {
 				const productDate = orderInfo.product_date.split('-').join('');
-				const factoryCode = orderInfo.line.split(' ').join('#');
+				let factoryCode = orderInfo.factory_code;
+				const factoryCodeList = factoryCode.split(' ');
+				if (factoryCodeList.length > 1) {
+					factoryCode = factoryCodeList.join('#');
+				}
 				const fileName =
 					`dat_MO#${orderInfo.sku}#${orderInfo.batch_no}#${productDate}#${orderInfo.line}#1_${factoryCode}_${orderInfo.line}_${productDate}144857224.txt`
 				const line1 =
@@ -128,7 +132,7 @@
 
 			},
 			createExcel(orderInfo, items) {
-				const orderNo = orderInfo.orderno;
+				const orderNo = orderInfo.orderno || 'no_orderno';
 				const excelFormatData = items.map(item => ({
 					'订单号': orderNo,
 					'条码信息': item.box_no,
