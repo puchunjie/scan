@@ -58,7 +58,7 @@
 				console.log('list', list)
 				this.list = list;
 			},
-			exportFile(orderItem) {
+			async exportFile(orderItem) {
 				// 查询订单下的瓶箱信息
 				const data = [];
 				const items = await getAllItem({
