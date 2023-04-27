@@ -9,9 +9,9 @@
 
 
 		<view class="btn-group">
-			<view class="btn" @click="changeSize(1)">1个装</view>
+			<!-- <view class="btn" @click="changeSize(1)">1个装</view>
 			<view class="btn" @click="changeSize(4)">4个装</view>
-			<view class="btn" @click="changeSize(12)">12个装</view>
+			<view class="btn" @click="changeSize(12)">12个装</view> -->
 			<view class="btn" @click="goList">完成扫码</view>
 		</view>
 
@@ -177,7 +177,7 @@
 			bottom: 0;
 			left: 0;
 			width: 100%;
-			height: 45px;
+			height: 57px;
 			line-height: 45px;
 			font-size: 14px;
 			display: flex;
@@ -185,13 +185,18 @@
 			color: #fff;
 			padding: 0 10px;
 			box-sizing: border-box;
+			padding-bottom: 12px;
 
 			.btn {
-				width: 23%;
+				// width: 23%;
+				flex: 1;
 				height: 100%;
 				text-align: center;
 				background-color: green;
 				border-radius: 4px;
+				&:not(:last-child) {
+					margin-right: 10px;
+				}
 
 				&.disabled {
 					background-color: #999;

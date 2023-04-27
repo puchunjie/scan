@@ -61,54 +61,55 @@
 			exportFile(orderItem) {
 				// 查询订单下的瓶箱信息
 				const data = [];
-				uni.showActionSheet({
-					itemList: ['1瓶装', '4瓶装', '12瓶装'],
-					success: async (res) => {
-						const typeList = [1, 4, 12];
-						const type = typeList[res.tapIndex]
-
-						const items = await getAllItem({
-							type,
-							orderId: orderItem.id
-						});
-						const productsInBox = items?.filter(item => item.status == 1);
-						const boxMap = {};
-						productsInBox.forEach(item => {
-							if (boxMap[item.box_no]) {
-								boxMap[item.box_no].push(item.item_no)
-							} else {
-								boxMap[item.box_no] = [item.item_no];
-							}
-						})
-						const boxNumber = Object.keys(boxMap).length;
-						console.log('boxNumber', boxNumber)
-						if (boxNumber == 0) {
-							uni.showToast({
-								icon: 'error',
-								title: '没有数据可以生成文件'
-							})
-							return
-						}
-						const textFileInfo = this.createTxt(orderItem, boxNumber, items)
-						const excelFileInfo = this.createExcel(orderItem, items);
-						uni.showLoading({
-							title: '文件导出中...',
-							mask: true
-						})
-						try {
-							await this.writeFile(textFileInfo)
-							await this.writeFile(excelFileInfo)
-							uni.hideLoading()
-							uni.showToast({
-								title: '文件已保存到本地',
-								icon: 'success',
-							});
-						} catch (error) {
-							console.log('err', error)
-							uni.hideLoading()
-						}
-					},
+				const items = await getAllItem({
+					type: 1,
+					orderId: orderItem.id
+				});
+				const productsInBox = items?.filter(item => item.status == 1);
+				const boxMap = {};
+				productsInBox.forEach(item => {
+					if (boxMap[item.box_no]) {
+						boxMap[item.box_no].push(item.item_no)
+					} else {
+						boxMap[item.box_no] = [item.item_no];
+					}
 				})
+				const boxNumber = Object.keys(boxMap).length;
+				console.log('boxNumber', boxNumber)
+				if (boxNumber == 0) {
+					uni.showToast({
+						icon: 'error',
+						title: '没有数据可以生成文件'
+					})
+					return
+				}
+				const textFileInfo = this.createTxt(orderItem, boxNumber, items)
+				const excelFileInfo = this.createExcel(orderItem, items);
+				uni.showLoading({
+					title: '文件导出中...',
+					mask: true
+				})
+				try {
+					await this.writeFile(textFileInfo)
+					await this.writeFile(excelFileInfo)
+					uni.hideLoading()
+					uni.showToast({
+						title: '文件已保存到本地',
+						icon: 'success',
+					});
+				} catch (error) {
+					console.log('err', error)
+					uni.hideLoading()
+				}
+				// uni.showActionSheet({
+				// 	itemList: ['1瓶装', '4瓶装', '12瓶装'],
+				// 	success: async (res) => {
+				// 		const typeList = [1, 4, 12];
+				// 		const type = typeList[res.tapIndex]
+
+
+				// 	},
+				// })
 			},
 			createTxt(orderInfo, boxNumber, items) {
 				const productDate = orderInfo.product_date.split('-').join('');
@@ -232,6 +233,7 @@
 			background: green;
 			border-radius: 5px;
 			color: #fff;
+
 			&:last-child {
 				margin-left: 10%;
 			}
