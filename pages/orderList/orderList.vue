@@ -101,15 +101,6 @@
 					console.log('err', error)
 					uni.hideLoading()
 				}
-				// uni.showActionSheet({
-				// 	itemList: ['1瓶装', '4瓶装', '12瓶装'],
-				// 	success: async (res) => {
-				// 		const typeList = [1, 4, 12];
-				// 		const type = typeList[res.tapIndex]
-
-
-				// 	},
-				// })
 			},
 			createTxt(orderInfo, boxNumber, items) {
 				const productDate = orderInfo.product_date.split('-').join('');
